@@ -17,6 +17,12 @@ const db = mysql.createConnection({
 const publicDirectory = path.join(__dirname, './public'); // set to the current directory
 app.use(express.static(publicDirectory));
 
+// Parse URL-encoded bodies (as sent by HTML forms) 
+// which is simply grab the data from the form
+app.use(express.urlencoded({extended: false}))
+// Parse JSON bodies (as sent by API clients) 
+app.use(express.json())
+
 app.set('view engine', 'hbs');
 
 db.connect((error) => {
@@ -26,17 +32,12 @@ db.connect((error) => {
     else {
         console.log("MYSQL Connected...")
     }
-})
-
-app.get("/", (req, res) => { // request, response
-    // res.send(("<h1>Home Page</h1>"))
-    res.render("index")
 });
 
-app.get("/register", (req, res) => { // request, response
-    // res.send(("<h1>Home Page</h1>"))
-    res.render("register")
-});
+// Define Routes
+app.use('/', require('./routes/pages.js'));
+app.use('/auth', require('./routes/auth.js'))
+
 
 app.listen(7000, () => {
     console.log("Server start on Port 7000")
